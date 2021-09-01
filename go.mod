@@ -2,10 +2,15 @@ module github.com/jdinabox/tool-server
 
 go 1.17
 
+// TODO: Wait for https://github.com/kubernetes/klog/pull/242
+replace github.com/go-logr/logr => github.com/go-logr/logr v0.4.0
+
 require (
 	github.com/allocamelus/allocamelus v0.0.0-20210524065912-74122e28a3c0
 	github.com/gofiber/fiber/v2 v2.18.0
+	github.com/jdinabox/go-await v0.0.0-20210901041928-61062ac5156f
 	github.com/json-iterator/go v1.1.11
+	k8s.io/klog/v2 v2.8.0
 )
 
 require (
@@ -18,5 +23,4 @@ require (
 	github.com/valyala/fasthttp v1.29.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/sys v0.0.0-20210521203332-0cec03c779c1 // indirect
-	k8s.io/klog/v2 v2.8.0 // indirect
 )
