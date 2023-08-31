@@ -1,26 +1,27 @@
-module github.com/jdinabox/tool-server
+module github.com/JDinABox/tool-server
 
-go 1.17
-
-// TODO: Wait for https://github.com/kubernetes/klog/pull/242
-replace github.com/go-logr/logr => github.com/go-logr/logr v0.4.0
+go 1.20
 
 require (
-	github.com/allocamelus/allocamelus v0.0.0-20210524065912-74122e28a3c0
-	github.com/gofiber/fiber/v2 v2.18.0
-	github.com/jdinabox/go-await v0.0.0-20210901041928-61062ac5156f
-	github.com/json-iterator/go v1.1.11
-	k8s.io/klog/v2 v2.8.0
+	github.com/gofiber/fiber/v2 v2.49.0
+	github.com/jdinabox/go-await v0.0.0-20210901041928-4b4849c0e422
+	github.com/json-iterator/go v1.1.12
+	k8s.io/klog/v2 v2.100.1
 )
 
 require (
-	github.com/andybalholm/brotli v1.0.2 // indirect
-	github.com/go-logr/logr v0.4.0 // indirect
-	github.com/klauspost/compress v1.13.4 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/go-logr/logr v1.2.0 // indirect
+	github.com/google/uuid v1.3.1 // indirect
+	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.29.0 // indirect
+	github.com/valyala/fasthttp v1.48.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/sys v0.0.0-20210521203332-0cec03c779c1 // indirect
+	golang.org/x/sys v0.11.0 // indirect
 )

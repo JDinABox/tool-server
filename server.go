@@ -1,7 +1,6 @@
 package toolserver
 
 import (
-	"github.com/allocamelus/allocamelus/pkg/logger"
 	"github.com/jdinabox/go-await"
 	jsoniter "github.com/json-iterator/go"
 	"k8s.io/klog/v2"
@@ -26,7 +25,7 @@ func (c *Config) Default() {
 func Start(conf *Config) {
 	app := newApp(conf)
 
-	logger.Fatal(app.Listen(conf.Listen))
+	logFatal(app.Listen(conf.Listen))
 }
 
 func StartAwaitInterupt(conf *Config, ai *await.Interrupt) {
@@ -38,6 +37,13 @@ func StartAwaitInterupt(conf *Config, ai *await.Interrupt) {
 		app.Shutdown()
 	}()
 
-	logger.Fatal(app.Listen(conf.Listen))
+	logFatal(app.Listen(conf.Listen))
 	ai.Done()
+}
+
+// logFatal
+func logFatal(err error) {
+	if err != nil {
+		klog.Fatal(err)
+	}
 }
