@@ -1,43 +1,50 @@
 package toolserver
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+)
 
 // newApp init fiber app
-func newApp(conf *Config) *fiber.App {
-	app := fiber.New(fiber.Config{
-		JSONEncoder: json.Marshal,
-		BodyLimit:   1 * 1024 * 2024, // 1MB
-	})
+func newApp() *chi.Mux {
+	r := chi.NewRouter()
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.CleanPath)
 
 	// Api base path
-	apiV1 := app.Group("/api/v1")
+	r.Route("/api/v1", func(r chi.Router) {
+		// ping
+		r.Route("/ping", func(r chi.Router) {
+			r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+				json.NewEncoder(w).Encode("pong")
+			})
+			r.Get("/pop", func(w http.ResponseWriter, r *http.Request) {
+				json.NewEncoder(w).Encode("meow")
+			})
+			r.Get("/meow", func(w http.ResponseWriter, r *http.Request) {
+				json.NewEncoder(w).Encode("pop")
+			})
+		})
 
-	// Return pong on ping
-	apiV1.Get("/ping", func(c *fiber.Ctx) error {
-		return c.JSON("pong")
-	})
-
-	// Return client ip
-	apiV1.Get("/ip", func(c *fiber.Ctx) error {
-		ips := c.IPs()
-		var ip string
-		if len(ips) > 0 {
-			ip = ips[0]
-		} else {
-			ip = c.IP()
-		}
-		return c.JSON(fiber.Map{
-			"ip": ip,
+		// Return client ip
+		r.Get("/ip", func(w http.ResponseWriter, r *http.Request) {
+			json.NewEncoder(w).Encode(map[string]any{"ip": r.RemoteAddr})
 		})
 	})
 
 	// 404 error
-	app.Use(func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"error":     "404",
-			"not-found": c.OriginalURL(),
-		})
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(
+			map[string]any{
+				"error":     "404",
+				"not-found": r.URL.String(),
+			})
 	})
 
-	return app
+	return r
 }

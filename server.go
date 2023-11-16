@@ -1,9 +1,9 @@
 package toolserver
 
 import (
-	"github.com/jdinabox/go-await"
+	"net/http"
+
 	jsoniter "github.com/json-iterator/go"
-	"k8s.io/klog/v2"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -23,27 +23,7 @@ func (c *Config) Default() {
 }
 
 func Start(conf *Config) {
-	app := newApp(conf)
+	mux := newApp()
 
-	logFatal(app.Listen(conf.Listen))
-}
-
-func StartAwaitInterupt(conf *Config, ai *await.Interrupt) {
-	app := newApp(conf)
-	// Wait for interupt and shutdown
-	go func() {
-		ai.Await()
-		klog.Info("Stopping fiber")
-		app.Shutdown()
-	}()
-
-	logFatal(app.Listen(conf.Listen))
-	ai.Done()
-}
-
-// logFatal
-func logFatal(err error) {
-	if err != nil {
-		klog.Fatal(err)
-	}
+	http.ListenAndServe(conf.Listen, mux)
 }
