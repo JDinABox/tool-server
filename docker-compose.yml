@@ -1,7 +1,7 @@
 services:
-  tools-crawford-zone:
-    image: tools-crawford-zone
-    container_name: tools-crawford-zone
+  tool-server:
+    image: tool-server
+    container_name: tool-server
     environment:
       LISTEN: ":80"
     expose:

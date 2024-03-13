@@ -17,6 +17,13 @@ func newApp() *chi.Mux {
 
 	// Api base path
 	r.Route("/api/v1", func(r chi.Router) {
+		r.Use(func(h http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				h.ServeHTTP(w, r)
+			})
+		})
+
 		// ping
 		r.Route("/ping", func(r chi.Router) {
 			r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -38,6 +45,7 @@ func newApp() *chi.Mux {
 
 	// 404 error
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(
 			map[string]any{
