@@ -4,5 +4,7 @@ services:
     container_name: tool-server
     environment:
       LISTEN: ":80"
+    volumes:
+      - ./files:/var/lib/tool-server/files
     expose:
       - 80

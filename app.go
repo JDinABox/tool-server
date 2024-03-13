@@ -43,6 +43,9 @@ func newApp() *chi.Mux {
 		})
 	})
 
+	// file server
+	r.Handle("/f/*", http.StripPrefix("/f", http.FileServer(http.Dir("/var/lib/tool-server/files"))))
+
 	// 404 error
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
