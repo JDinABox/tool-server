@@ -74,12 +74,25 @@ func newApp() *chi.Mux {
 				})
 			})
 
-			// /l/services/{service(s)}
+			// /l/services/{service(s)}?format=(adp|wildcard)
+			// default format is wildcard
 			// service(s) can be a + separated list of services
 			r.Get("/{services}", func(w http.ResponseWriter, r *http.Request) {
 				serviceStr := chi.URLParam(r, "services")
 				serviceStr = strings.ToLower(strings.TrimSpace(serviceStr))
 				services := strings.Split(serviceStr, "+")
+
+				formatStr := strings.TrimSpace(r.URL.Query().Get("format"))
+				formatStr = strings.ToLower(formatStr)
+				var format adguard.FormatEnum
+				switch formatStr {
+				case "adp":
+					format = adguard.FormatAdp
+				case "wildcard":
+				case "":
+				default:
+					format = adguard.FormatWildcard
+				}
 
 				knownServices, err := adguardServer.AdguardContent(r.Context())
 				if err != nil {
@@ -93,7 +106,7 @@ func newApp() *chi.Mux {
 					if service == "" {
 						continue
 					}
-					s, err := knownServices.ServiceList(service)
+					s, err := knownServices.ServiceList(service, format)
 					if err != nil {
 						w.WriteHeader(http.StatusNotFound)
 						json.NewEncoder(w).Encode(

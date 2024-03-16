@@ -28,14 +28,37 @@ func (s *AdguardServices) toMap() {
 	}
 }
 
-func (s *AdguardServices) ServiceList(serviceN string) (string, error) {
+type FormatEnum int
+
+const (
+	FormatWildcard FormatEnum = iota
+	FormatAdp
+)
+
+func (s *AdguardServices) ServiceList(serviceN string, format FormatEnum) (string, error) {
 	service, ok := s.MappedServices[serviceN]
 	if !ok {
 		return "", ErrServiceNotFound
 	}
 	var output strings.Builder
 	for _, v := range service.Rules {
-		output.WriteString(v)
+		if format == FormatAdp {
+			output.WriteString(v)
+		} else {
+			vArr := strings.Split(v, "\n")
+			// convert adp to wildcard
+			for _, vv := range vArr {
+				vv = strings.TrimSpace(vv)
+				vv = strings.ReplaceAll(vv, "||", "")
+				vv = strings.ReplaceAll(vv, "^", "")
+				if i := strings.Index(vv, "*."); i != -1 {
+					vv = vv[strings.Index(vv, "*.")+2:]
+				}
+				output.WriteString("*.")
+				output.WriteString(vv)
+			}
+		}
+
 		output.WriteRune('\n')
 	}
 	return output.String(), nil
