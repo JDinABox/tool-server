@@ -6,6 +6,7 @@ COPY go.* ./
 RUN go mod download
 COPY ./cmd/ ./cmd/
 COPY ./Makefile ./Makefile
+COPY ./internal ./internal
 COPY *.go ./
 RUN --mount=type=cache,target=/root/.cache/go-build make build
 
