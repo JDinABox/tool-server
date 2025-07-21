@@ -42,22 +42,22 @@ func (s *AdguardServices) ServiceList(serviceN string, format FormatEnum) (strin
 		return "", ErrServiceNotFound
 	}
 	var output strings.Builder
-	for _, v := range service.Rules {
+	for _, rule := range service.Rules {
 		switch format {
 		case FormatAdp:
-			output.WriteString(v)
+			output.WriteString(rule)
 		default:
-			vvArr := strings.Split(strings.TrimSpace(v), "\n")
+			ruleLine := strings.Split(strings.TrimSpace(rule), "\n")
 			// convert adp to wildcard
-			for _, vv := range vvArr {
-				vv = strings.TrimSpace(vv)
-				vv = strings.ReplaceAll(vv, "||", "")
-				vv = strings.ReplaceAll(vv, "^", "")
-				if i := strings.Index(vv, "*."); i != -1 {
-					vv = vv[strings.Index(vv, "*.")+2:]
+			for _, line := range ruleLine {
+				line = strings.TrimSpace(line)
+				line = strings.ReplaceAll(line, "||", "")
+				line = strings.ReplaceAll(line, "^", "")
+				if i := strings.Index(line, "*."); i != -1 {
+					line = line[strings.Index(line, "*.")+2:]
 				}
 				output.WriteString("*.")
-				output.WriteString(vv)
+				output.WriteString(line)
 			}
 		}
 		output.WriteRune('\n') // Add newline after each rule
