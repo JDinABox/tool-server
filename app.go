@@ -20,34 +20,13 @@ func newApp() *chi.Mux {
 	r.Use(middleware.CleanPath)
 
 	// Api base path
-	r.Route("/api/v1", func(r chi.Router) {
-		r.Use(func(h http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "application/json")
-				h.ServeHTTP(w, r)
-			})
-		})
-
-		// ping
-		r.Route("/ping", func(r chi.Router) {
-			r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-				json.NewEncoder(w).Encode("pong")
-			})
-			r.Get("/pop", func(w http.ResponseWriter, r *http.Request) {
-				json.NewEncoder(w).Encode("meow")
-			})
-			r.Get("/meow", func(w http.ResponseWriter, r *http.Request) {
-				json.NewEncoder(w).Encode("pop")
-			})
-		})
-
-		// Return client ip
-		r.Get("/ip", func(w http.ResponseWriter, r *http.Request) {
-			json.NewEncoder(w).Encode(map[string]any{"ip": r.RemoteAddr})
-		})
-	})
+	// /api/v1
+	r.Route("/api/v1", v1apiRouter)
+	// /api
+	r.Route("/api", v1apiRouter)
 
 	// file server
+	// /f/*
 	r.Handle("/f/*", http.StripPrefix("/f", http.FileServer(http.Dir("/var/lib/tool-server/files"))))
 
 	// lists
@@ -124,6 +103,7 @@ func newApp() *chi.Mux {
 		})
 
 	})
+
 	// 404 error
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -136,4 +116,32 @@ func newApp() *chi.Mux {
 	})
 
 	return r
+}
+
+// v1apiRouter
+// /api/v1
+func v1apiRouter(r chi.Router) {
+	// Use middleware to set "Content-Type" header for each response
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			// Call the next handler in chain
+			next.ServeHTTP(w, r)
+		})
+	})
+
+	// Define ping route group
+	// /api/v1/ping
+	r.Route("/ping", func(r chi.Router) {
+		// /api/v1/ping
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			json.NewEncoder(w).Encode("pong")
+		})
+	})
+
+	// /api/v1/ip
+	// Get the IP address of the requestor
+	r.Get("/ip", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]interface{}{"ip": r.RemoteAddr})
+	})
 }

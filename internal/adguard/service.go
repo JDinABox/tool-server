@@ -7,6 +7,7 @@ import (
 
 //go:generate msgp -io=false -tests=false
 
+// AdguardService
 type AdguardService struct {
 	ID      string   `json:"id"`
 	Name    string   `json:"name"`
@@ -22,7 +23,7 @@ type AdguardServices struct {
 var ErrServiceNotFound = errors.New("not found")
 
 func (s *AdguardServices) toMap() {
-	s.MappedServices = make(map[string]AdguardService)
+	s.MappedServices = make(map[string]AdguardService, len(s.BlockedServices))
 	for _, v := range s.BlockedServices {
 		s.MappedServices[v.ID] = v
 	}
@@ -42,12 +43,13 @@ func (s *AdguardServices) ServiceList(serviceN string, format FormatEnum) (strin
 	}
 	var output strings.Builder
 	for _, v := range service.Rules {
-		if format == FormatAdp {
+		switch format {
+		case FormatAdp:
 			output.WriteString(v)
-		} else {
-			vArr := strings.Split(v, "\n")
+		default:
+			vvArr := strings.Split(strings.TrimSpace(v), "\n")
 			// convert adp to wildcard
-			for _, vv := range vArr {
+			for _, vv := range vvArr {
 				vv = strings.TrimSpace(vv)
 				vv = strings.ReplaceAll(vv, "||", "")
 				vv = strings.ReplaceAll(vv, "^", "")
@@ -58,8 +60,7 @@ func (s *AdguardServices) ServiceList(serviceN string, format FormatEnum) (strin
 				output.WriteString(vv)
 			}
 		}
-
-		output.WriteRune('\n')
+		output.WriteRune('\n') // Add newline after each rule
 	}
 	return output.String(), nil
 }
